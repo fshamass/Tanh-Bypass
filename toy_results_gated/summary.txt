@@ -1,0 +1,52 @@
+Reference controllers (saturated bang-bang) on the same eval grid:
+    |a| <= 1.0   return =   -30.3
+    |a| <= 0.9   return =   -31.5
+    |a| <= 0.7   return =   -36.2
+    |a| <= 0.5   return =   -43.7
+    |a| <= 0.3   return =   -60.0
+
+toy_bangbang: 10 paired seeds x 40000 steps, eval every 2500, 44 held-out starts
+bypass mask: GATED  a_on=0.9 delta_wall=0.001
+threshold for steps-to-threshold: return >= -35.0
+
+  seed  0   base: ret=  -31.5 steps2thr= 25000 auc=  -76.3    bypass: ret= -131.5 steps2thr= 40000 auc= -140.2
+  seed  1   base: ret=  -29.9 steps2thr= 30000 auc=  -81.6    bypass: ret=  -93.8 steps2thr= 40000 auc= -117.3
+  seed  2   base: ret=  -29.4 steps2thr= 20000 auc=  -72.4    bypass: ret= -130.0 steps2thr= 40000 auc= -117.3
+  seed  3   base: ret=  -33.0 steps2thr= 25000 auc=  -72.7    bypass: ret=  -91.9 steps2thr= 40000 auc= -109.3
+  seed  4   base: ret=  -30.9 steps2thr= 22500 auc=  -72.7    bypass: ret=  -69.8 steps2thr= 40000 auc= -100.6
+  seed  5   base: ret=  -30.2 steps2thr= 17500 auc=  -70.2    bypass: ret= -137.7 steps2thr= 40000 auc= -119.7
+  seed  6   base: ret=  -29.3 steps2thr= 20000 auc=  -62.3    bypass: ret=  -84.1 steps2thr= 40000 auc= -102.7
+  seed  7   base: ret=  -31.6 steps2thr= 20000 auc=  -76.9    bypass: ret= -133.3 steps2thr= 40000 auc= -123.5
+  seed  8   base: ret=  -38.8 steps2thr= 22500 auc=  -72.1    bypass: ret=  -86.7 steps2thr= 40000 auc= -132.4
+  seed  9   base: ret=  -31.6 steps2thr= 22500 auc=  -77.2    bypass: ret= -126.7 steps2thr= 40000 auc= -135.8
+
+=== SAMPLE EFFICIENCY (the live hypothesis: does the bypass get there FASTER?) ===
+
+metric               baseline     bypass       diff       t   verdict
+------------------------------------------------------------------------
+steps_to_threshold  22500.000  40000.000 +17500.000  +15.65   BYPASS LOSES
+auc                   -73.437   -119.887    -46.450  -12.43   BYPASS LOSES
+reached_threshold       1.000      0.000     -1.000    +nan   no effect
+
+=== FINAL PERFORMANCE (theory says this should NOT move) ===
+
+metric               baseline     bypass       diff       t   verdict
+------------------------------------------------------------------------
+return                -31.632   -108.555    -76.923   -9.24   BYPASS LOSES
+reach_rate              1.000      0.577     -0.423   -7.59   BYPASS LOSES
+
+=== MECHANISM (does the bypass reach the bound?) ===
+
+metric               baseline     bypass       diff       t   verdict
+------------------------------------------------------------------------
+mean_abs_action         0.694      0.167     -0.527  -14.69   BYPASS LOSES
+sat_frac                0.318      0.053     -0.265   -7.84   BYPASS LOSES
+p95_abs_action          0.968      0.699     -0.268   -2.75   BYPASS LOSES
+
+Effective action cap:  baseline ~0.89   bypass ~0.30   (optimal = 1.00)
+
+How to read this:
+  steps_to_threshold DOWN / auc UP  -> the bypass speeds learning up. The live claim.
+  sample efficiency flat            -> the mechanism does nothing; stop here.
+  final return moves                -> unexpected; the throttle is biasing the endpoint
+                                       after all, and the theory in the notes is wrong.

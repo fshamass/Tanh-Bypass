@@ -1,0 +1,25 @@
+# Tanh Bypass — Python dependencies
+#
+# Tested with Python 3.10. Install via:
+#   python3.10 -m venv venv && source venv/bin/activate
+#   pip install -r requirements.txt
+#
+
+# Core RL stack
+torch>=2.0,<2.4
+stable-baselines3>=2.2,<2.4
+tensorboard>=2.14
+
+# Numerical / data
+numpy>=1.24,<2.0
+scipy>=1.11
+pandas>=2.0
+
+# MetaDrive simulator (drop-in pip)
+metadrive-simulator>=0.4.2.3
+
+# Plotting (used by scripts/plot_csv.py to produce paper figures)
+matplotlib>=3.7
+
+# Misc
+tqdm>=4.65
